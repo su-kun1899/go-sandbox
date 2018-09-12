@@ -9,9 +9,7 @@ import (
 
 func TestGreeting_Do(t *testing.T) {
 	g := greeting.Greeting{
-		Clock: greeting.ClockFunc(func() time.Time {
-			return time.Date(2018, 8, 31, 6, 0, 0, 0, time.Local)
-		}),
+		Clock: mockClock(t, "2018/08/31 06:00:00"),
 	}
 
 	var buf bytes.Buffer
@@ -22,4 +20,16 @@ func TestGreeting_Do(t *testing.T) {
 	if expected, actual := "おはよう", buf.String(); expected != actual {
 		t.Errorf("greeting message want %s but got %s", expected, actual)
 	}
+}
+
+func mockClock(t *testing.T, v string) greeting.Clock {
+	t.Helper()
+	now, err := time.Parse("2006/01/02 15:04:05", v)
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	return greeting.ClockFunc(func() time.Time {
+		return now
+	})
 }
