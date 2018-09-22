@@ -6,6 +6,7 @@ import (
 	"time"
 	"bytes"
 	"io"
+	"errors"
 )
 
 func TestGreeting_Do(t *testing.T) {
@@ -46,6 +47,10 @@ func TestGreeting_Do(t *testing.T) {
 			clock:  mockClock(t, "2018/08/31 03:00:00"),
 			msg:    "こんばんは",
 		},
+		"エラー": {
+			writer:    &errorWriter{Err: errors.New("error")},
+			expectErr: true,
+		},
 	}
 
 	for n, tc := range cases {
@@ -84,4 +89,12 @@ func mockClock(t *testing.T, v string) greeting.Clock {
 	return greeting.ClockFunc(func() time.Time {
 		return now
 	})
+}
+
+type errorWriter struct {
+	Err error
+}
+
+func (w *errorWriter) Write(p []byte) (n int, err error) {
+	return 0, w.Err
 }
