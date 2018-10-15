@@ -8,21 +8,21 @@ import (
 
 // TODO 複数行読み込みたい
 func ReadFromLast(fileName string) ([]string, error) {
-	// TODO 空ファイルの時どうなる？
-
 	file, err := os.Open(fileName)
 	if err != nil {
-		// TODO untested
 		return nil, err
 	}
 	defer file.Close()
 
 	fileInfo, err := file.Stat()
 	if err != nil {
-		// TODO untested
+		// untested: openできたのにinfoが取れないことはないはず？
 		return nil, err
 	}
 	fmt.Printf("fileName: %v, fileSize: %v\n", fileInfo.Name(), fileInfo.Size())
+	if fileInfo.Size() == 0 {
+		return nil, nil
+	}
 
 	cursor := int64(0)
 	line := ""

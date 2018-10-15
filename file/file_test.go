@@ -34,6 +34,18 @@ func TestReadFromLast(t *testing.T) {
 			want:    []string{"is CRLF\r\n"},
 			wantErr: false,
 		},
+		{
+			name:    "Empty file",
+			args:    args{fileName: "testdata/empty.txt"},
+			want:    nil,
+			wantErr: false,
+		},
+		{
+			name:    "File open error",
+			args:    args{fileName: "dummy.txt"},
+			want:    nil,
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
