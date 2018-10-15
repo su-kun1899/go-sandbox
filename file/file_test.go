@@ -22,6 +22,12 @@ func TestReadFromLast(t *testing.T) {
 			want:    []string{"100"},
 			wantErr: false,
 		},
+		{
+			name:    "Read file from last line",
+			args:    args{fileName: "testdata/bar.txt"},
+			want:    []string{"50"},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
