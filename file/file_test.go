@@ -19,13 +19,19 @@ func TestReadFromLast(t *testing.T) {
 		{
 			name:    "Read file from last line",
 			args:    args{fileName: "testdata/foo.txt"},
-			want:    []string{"100"},
+			want:    []string{"100\n"},
 			wantErr: false,
 		},
 		{
 			name:    "Read file from last line",
 			args:    args{fileName: "testdata/bar.txt"},
-			want:    []string{"50"},
+			want:    []string{"50\n"},
+			wantErr: false,
+		},
+		{
+			name:    "Read file with CR line feed",
+			args:    args{fileName: "testdata/crlf.txt"},
+			want:    []string{"is CRLF\r\n"},
 			wantErr: false,
 		},
 	}

@@ -24,7 +24,6 @@ func ReadFromLast(fileName string) ([]string, error) {
 	}
 	fmt.Printf("fileName: %v, fileSize: %v\n", fileInfo.Name(), fileInfo.Size())
 
-	// TODO 改行はLF/CR/CRLFに対応したい
 	cursor := int64(0)
 	line := make([]byte, 0)
 	for i := int64(0); i < fileInfo.Size(); i++ {
@@ -35,15 +34,11 @@ func ReadFromLast(fileName string) ([]string, error) {
 		char := make([]byte, 1)
 		file.Read(char)
 
-		if char[0] == 10 {
+		fmt.Printf("char[0]: %v\n", char[0])
+		if i != 0 && char[0] == 10 {
 			fmt.Println("改行だ")
-			if i == 0 {
-				continue
-			}
 			break
 		}
-
-		fmt.Printf("char[0]: %v\n", char[0])
 		line = append(line, char[0])
 	}
 
@@ -51,8 +46,6 @@ func ReadFromLast(fileName string) ([]string, error) {
 	for left, right := 0, len(line)-1; left < right; left, right = left+1, right-1 {
 		line[left], line[right] = line[right], line[left]
 	}
-
-	fmt.Printf("line: %v\n", string(line))
 
 	return []string{string(line)}, nil
 }
