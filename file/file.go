@@ -6,6 +6,8 @@ import (
 	"io"
 )
 
+const LF  = 10
+
 // TODO 複数行読み込みたい
 func ReadFromLast(fileName string) ([]string, error) {
 	file, err := os.Open(fileName)
@@ -34,8 +36,7 @@ func ReadFromLast(fileName string) ([]string, error) {
 		char := make([]byte, 1)
 		file.Read(char)
 
-		if i != 0 && char[0] == 10 {
-			fmt.Println("改行だ")
+		if i != 0 && char[0] == LF {
 			break
 		}
 		line = fmt.Sprintf("%s%s", string(char), line)
