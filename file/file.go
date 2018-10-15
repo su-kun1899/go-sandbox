@@ -6,7 +6,7 @@ import (
 	"io"
 )
 
-const LF  = 10
+const LF = 10
 
 // TODO 複数行読み込みたい
 func ReadFromLast(fileName string) ([]string, error) {
@@ -28,10 +28,9 @@ func ReadFromLast(fileName string) ([]string, error) {
 
 	cursor := int64(0)
 	line := ""
-	for i := int64(0); i < fileInfo.Size(); i++ {
+	for i := 0; ; i++ {
+		// 一文字ずつ後ろから読む
 		cursor--
-
-		// 一文字を読む
 		file.Seek(cursor, io.SeekEnd)
 		char := make([]byte, 1)
 		file.Read(char)
@@ -41,6 +40,10 @@ func ReadFromLast(fileName string) ([]string, error) {
 		}
 		line = fmt.Sprintf("%s%s", string(char), line)
 		fmt.Printf("line: %v", line)
+
+		if cursor == -fileInfo.Size() {
+			break
+		}
 	}
 
 	return []string{line}, nil

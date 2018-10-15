@@ -41,6 +41,12 @@ func TestReadFromLast(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name:    "Read single line file",
+			args:    args{fileName: "testdata/oneline.txt"},
+			want:    []string{"first line is last line\n"},
+			wantErr: false,
+		},
+		{
 			name:    "File open error",
 			args:    args{fileName: "dummy.txt"},
 			want:    nil,
