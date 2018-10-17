@@ -28,12 +28,12 @@ func main() {
 	}
 	fmt.Printf("fileName: %v, fileSize: %v\n", fileInfo.Name(), fileInfo.Size())
 
-	cursor, err := lastCursor(fileName)
+	currentLast, err := lastCursor(fileName)
 	if err != nil {
 		fmt.Fprintf(errWriter, "%v\n", err)
 		return
 	}
-	fmt.Fprintf(writer, "cursor: %v\n", cursor)
+	fmt.Fprintf(writer, "currentLast: %v\n", currentLast)
 
 	currentSize, err := fileSize(fileName)
 	if err != nil {
@@ -54,8 +54,8 @@ func main() {
 			return
 		}
 
-		newCursor, err := lastCursor(fileName)
-		log.Printf("cursor: %v, newCursor: %v\n", cursor, newCursor)
+		newLast, err := lastCursor(fileName)
+		log.Printf("currentLast: %v, newLast: %v\n", currentLast, newLast)
 		if currentSize != newSize {
 			return
 		}
