@@ -54,9 +54,22 @@ func main() {
 			return
 		}
 
-		newLast, err := lastCursor(fileName)
-		log.Printf("currentLast: %v, newLast: %v\n", currentLast, newLast)
 		if currentSize != newSize {
+			newLast, err := lastCursor(fileName)
+			log.Printf("currentLast: %v, newLast: %v\n", currentLast, newLast)
+			newText := make([]byte, newLast - currentLast)
+
+			f, err := os.Open(fileName)
+			if err != nil {
+				fmt.Fprintf(errWriter, "%v\n", err)
+				return
+			}
+
+			f.Seek(currentLast, io.SeekStart)
+			f.Read(newText)
+			fmt.Fprintf(writer, "appended: %s", string(newText))
+			f.Close()
+
 			return
 		}
 
