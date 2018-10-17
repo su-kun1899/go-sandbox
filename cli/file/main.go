@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/su-kun1899/go-sandbox/file"
 	"io"
 	"log"
 	"os"
@@ -55,22 +54,12 @@ func main() {
 		}
 
 		if currentSize != newSize {
-			newLast, err := lastCursor(fileName)
-			log.Printf("currentLast: %v, newLast: %v\n", currentLast, newLast)
-			newText := make([]byte, newLast - currentLast)
-
-			f, err := os.Open(fileName)
+			currentSize = newSize
+			currentLast, err = read(fileName, currentLast, writer)
 			if err != nil {
 				fmt.Fprintf(errWriter, "%v\n", err)
 				return
 			}
-
-			f.Seek(currentLast, io.SeekStart)
-			f.Read(newText)
-			fmt.Fprintf(writer, "appended: %s", string(newText))
-			f.Close()
-
-			return
 		}
 
 		//size := fileInfo.Size()
@@ -80,7 +69,27 @@ func main() {
 		//}
 	}
 
-	read(writer, errWriter, fileName)
+	//read(writer, errWriter, fileName)
+}
+
+func read(fileName string, cursor int64, writer io.Writer) (int64, error) {
+	lastCursor, err := lastCursor(fileName)
+	if err != nil {
+		return 0, err
+	}
+
+	newText := make([]byte, lastCursor-cursor)
+	f, err := os.Open(fileName)
+	if err != nil {
+		return 0, err
+	}
+	defer f.Close()
+
+	f.Seek(cursor, io.SeekStart)
+	f.Read(newText)
+	fmt.Fprintf(writer, "appended: %s", string(newText))
+
+	return f.Seek(-1, io.SeekCurrent)
 }
 
 func lastCursor(fileName string) (int64, error) {
@@ -109,11 +118,11 @@ func fileSize(fileName string) (int64, error) {
 	return fileInfo.Size(), nil
 }
 
-func read(writer, errWriter io.Writer, fileName string) {
-	strings, err := file.ReadFromLast(fileName)
-	if err != nil {
-		fmt.Fprintf(errWriter, "%v\n", err)
-		return
-	}
-	fmt.Fprintf(writer, "%v\n", strings[0])
-}
+//func read(writer, errWriter io.Writer, fileName string) {
+//	strings, err := file.ReadFromLast(fileName)
+//	if err != nil {
+//		fmt.Fprintf(errWriter, "%v\n", err)
+//		return
+//	}
+//	fmt.Fprintf(writer, "%v\n", strings[0])
+//}
