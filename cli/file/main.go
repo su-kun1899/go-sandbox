@@ -42,16 +42,21 @@ func main() {
 	}
 	for {
 		time.Sleep(1 * time.Second)
-		log.Println("loop...")
 
 		newSize, err := fileSize(fileName)
 		if err != nil {
 			fmt.Fprintf(errWriter, "%v\n", err)
 			return
 		}
+		log.Printf("currentSize: %v, newSize: %v\n", currentSize, newSize)
+		if err != nil {
+			fmt.Fprintf(errWriter, "%v\n", err)
+			return
+		}
 
+		newCursor, err := lastCursor(fileName)
+		log.Printf("cursor: %v, newCursor: %v\n", cursor, newCursor)
 		if currentSize != newSize {
-			fmt.Printf("currentSize: %v, newSize: %v\n", currentSize, newSize)
 			return
 		}
 
