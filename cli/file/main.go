@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"path/filepath"
 	"time"
@@ -47,7 +46,7 @@ func main() {
 			fmt.Fprintf(errWriter, "%v\n", err)
 			return
 		}
-		log.Printf("currentSize: %v, newSize: %v\n", currentSize, newSize)
+		//log.Printf("currentSize: %v, newSize: %v\n", currentSize, newSize)
 		if err != nil {
 			fmt.Fprintf(errWriter, "%v\n", err)
 			return
@@ -61,15 +60,7 @@ func main() {
 				return
 			}
 		}
-
-		//size := fileInfo.Size()
-		//if size > 5 {
-		//	fmt.Fprintf(writer, "size: %v\n", size)
-		//	return
-		//}
 	}
-
-	//read(writer, errWriter, fileName)
 }
 
 func read(fileName string, cursor int64, writer io.Writer) (int64, error) {
@@ -87,7 +78,7 @@ func read(fileName string, cursor int64, writer io.Writer) (int64, error) {
 
 	f.Seek(cursor, io.SeekStart)
 	f.Read(newText)
-	fmt.Fprintf(writer, "appended: %s", string(newText))
+	fmt.Fprintf(writer, "%s", string(newText))
 
 	return f.Seek(-1, io.SeekCurrent)
 }
@@ -117,12 +108,3 @@ func fileSize(fileName string) (int64, error) {
 
 	return fileInfo.Size(), nil
 }
-
-//func read(writer, errWriter io.Writer, fileName string) {
-//	strings, err := file.ReadFromLast(fileName)
-//	if err != nil {
-//		fmt.Fprintf(errWriter, "%v\n", err)
-//		return
-//	}
-//	fmt.Fprintf(writer, "%v\n", strings[0])
-//}
