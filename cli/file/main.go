@@ -18,6 +18,17 @@ func main() {
 	}
 	//detectFileSizeChange(os.Stdout, fileName)
 	seek(os.Stdout, fileName)
+
+	var chars = []byte{97, 98, 99, 10, 100, 101, 102, 103, 10, 104, 105, 106, 107, 108, 109, 110, 111, 112, 10, 113, 114, 10, 0, 0, 0, 0, 0, 0, 0, 0}
+	extractLine(os.Stdout, chars)
+}
+
+func extractLine(w io.Writer, chars []byte) {
+	var extracted = make([]byte, 0, len(chars))
+	for _, char := range chars {
+		extracted = append(extracted, char)
+	}
+	fmt.Fprintf(w, "extracted: %v\n", extracted)
 }
 
 func seek(w io.Writer, fileName string) error {
@@ -41,7 +52,7 @@ func seek(w io.Writer, fileName string) error {
 	fmt.Fprintf(w, "fileSize: %v\n", fileInfo.Size())
 	fmt.Fprintf(w, "cursor1: %v\n", cursor)
 
-	chars := make([]byte, limit - offset)
+	chars := make([]byte, limit-offset)
 	fp.Read(chars)
 
 	fmt.Fprintf(w, "chars:%s \n", string(chars))
@@ -51,7 +62,7 @@ func seek(w io.Writer, fileName string) error {
 		return err
 	}
 	fmt.Fprintf(w, "cursor2: %v\n", cursor)
-	fmt.Fprintf(w, "chars len: %v\n", chars)
+	fmt.Fprintf(w, "chars: %v\n", chars)
 
 	return nil
 }
