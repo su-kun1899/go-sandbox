@@ -4,64 +4,97 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path/filepath"
+	"log"
 	"time"
+	"path/filepath"
 )
 
 func main() {
-	writer := os.Stdout
-	errWriter := os.Stderr
-
 	// TODO パスはどうにかしないと
 	fileName, err := filepath.Abs("file/testdata/append.txt")
 	if err != nil {
-		fmt.Fprintf(errWriter, "%v\n", err)
+		log.Fatalf("%v\n", err)
 		return
 	}
+	detectFileSizeChange(os.Stdout, fileName)
+}
 
+func detectFileSizeChange(w io.Writer, fileName string) error {
 	fileInfo, err := os.Stat(fileName)
 	if err != nil {
-		fmt.Fprintf(errWriter, "%v\n", err)
-		return
+		return err
 	}
-	fmt.Printf("fileName: %v, fileSize: %v\n", fileInfo.Name(), fileInfo.Size())
 
-	currentLast, err := lastCursor(fileName)
-	if err != nil {
-		fmt.Fprintf(errWriter, "%v\n", err)
-		return
-	}
-	fmt.Fprintf(writer, "currentLast: %v\n", currentLast)
+	for i := 0; i < 10; i++ {
+		preSize := fileInfo.Size()
+		fileInfo, err = os.Stat(fileName)
+		if err != nil {
+			return err
+		}
+		currentSize := fileInfo.Size()
 
-	currentSize, err := fileSize(fileName)
-	if err != nil {
-		fmt.Fprintf(errWriter, "%v\n", err)
-		return
-	}
-	for {
+		fmt.Fprintf(w, "preSize: %v, currentSize:%v\n", preSize, currentSize)
+
 		time.Sleep(1 * time.Second)
-
-		newSize, err := fileSize(fileName)
-		if err != nil {
-			fmt.Fprintf(errWriter, "%v\n", err)
-			return
-		}
-		//log.Printf("currentSize: %v, newSize: %v\n", currentSize, newSize)
-		if err != nil {
-			fmt.Fprintf(errWriter, "%v\n", err)
-			return
-		}
-
-		if currentSize != newSize {
-			currentSize = newSize
-			currentLast, err = read(fileName, currentLast, writer)
-			if err != nil {
-				fmt.Fprintf(errWriter, "%v\n", err)
-				return
-			}
-		}
 	}
+
+	return nil
 }
+
+//func main() {
+//	writer := os.Stdout
+//	errWriter := os.Stderr
+//
+//	// TODO パスはどうにかしないと
+//	fileName, err := filepath.Abs("file/testdata/append.txt")
+//	if err != nil {
+//		fmt.Fprintf(errWriter, "%v\n", err)
+//		return
+//	}
+//
+//	fileInfo, err := os.Stat(fileName)
+//	if err != nil {
+//		fmt.Fprintf(errWriter, "%v\n", err)
+//		return
+//	}
+//	fmt.Printf("fileName: %v, fileSize: %v\n", fileInfo.Name(), fileInfo.Size())
+//
+//	currentLast, err := lastCursor(fileName)
+//	if err != nil {
+//		fmt.Fprintf(errWriter, "%v\n", err)
+//		return
+//	}
+//	fmt.Fprintf(writer, "currentLast: %v\n", currentLast)
+//
+//	currentSize, err := fileSize(fileName)
+//	if err != nil {
+//		fmt.Fprintf(errWriter, "%v\n", err)
+//		return
+//	}
+//	for {
+//		time.Sleep(1 * time.Second)
+//
+//		newSize, err := fileSize(fileName)
+//		if err != nil {
+//			fmt.Fprintf(errWriter, "%v\n", err)
+//			return
+//		}
+//		//log.Printf("currentSize: %v, newSize: %v\n", currentSize, newSize)
+//		if err != nil {
+//			fmt.Fprintf(errWriter, "%v\n", err)
+//			return
+//		}
+//
+//		if currentSize != newSize {
+//			currentSize = newSize
+//			currentLast, err = read(fileName, currentLast, writer)
+//			if err != nil {
+//				fmt.Fprintf(errWriter, "%v\n", err)
+//				return
+//			}
+//		}
+//	}
+//}
 
 func read(fileName string, cursor int64, writer io.Writer) (int64, error) {
 	lastCursor, err := lastCursor(fileName)
