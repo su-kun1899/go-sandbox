@@ -32,18 +32,25 @@ func seek(w io.Writer, fileName string) error {
 		return err
 	}
 
-	var offset, limit int64 = 0, 10
+	var offset, limit int64 = 3, 6
 
 	cursor, err := fp.Seek(offset, io.SeekStart)
 	if err != nil {
 		return err
 	}
 	fmt.Fprintf(w, "fileSize: %v\n", fileInfo.Size())
-	fmt.Fprintf(w, "cursor: %v\n", cursor)
+	fmt.Fprintf(w, "cursor1: %v\n", cursor)
 
-	chars := make([]byte, limit)
+	chars := make([]byte, limit - offset)
 	fp.Read(chars)
+
 	fmt.Fprintf(w, "chars:%s \n", string(chars))
+
+	cursor, err = fp.Seek(0, io.SeekCurrent)
+	if err != nil {
+		return err
+	}
+	fmt.Fprintf(w, "cursor2: %v\n", cursor)
 
 	return nil
 }
