@@ -1,7 +1,18 @@
 package file
 
-import "io"
+import (
+	"io"
+	"os"
+	"fmt"
+)
 
-func ReadRealTime(w io.Writer, fileName string) {
+func Seek(w io.Writer, fileName string) error {
+	fileInfo, err := os.Stat(fileName)
+	if err != nil {
+		return err
+	}
 
+	fmt.Fprintf(w, "fileSize: %v\n", fileInfo.Size())
+
+	return nil
 }
