@@ -32,7 +32,7 @@ func seek(w io.Writer, fileName string) error {
 		return err
 	}
 
-	var offset, limit int64 = 3, 6
+	var offset, limit int64 = 0, 30
 
 	cursor, err := fp.Seek(offset, io.SeekStart)
 	if err != nil {
@@ -51,6 +51,7 @@ func seek(w io.Writer, fileName string) error {
 		return err
 	}
 	fmt.Fprintf(w, "cursor2: %v\n", cursor)
+	fmt.Fprintf(w, "chars len: %v\n", chars)
 
 	return nil
 }
