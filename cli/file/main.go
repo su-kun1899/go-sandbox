@@ -16,7 +16,36 @@ func main() {
 		log.Fatalf("%v\n", err)
 		return
 	}
-	detectFileSizeChange(os.Stdout, fileName)
+	//detectFileSizeChange(os.Stdout, fileName)
+	seek(os.Stdout, fileName)
+}
+
+func seek(w io.Writer, fileName string) error {
+
+	fp, err := os.Open(fileName)
+	if err != nil {
+		return err
+	}
+	defer fp.Close()
+	fileInfo, err := fp.Stat()
+	if err != nil {
+		return err
+	}
+
+	var offset, limit int64 = 0, 10
+
+	cursor, err := fp.Seek(offset, io.SeekStart)
+	if err != nil {
+		return err
+	}
+	fmt.Fprintf(w, "fileSize: %v\n", fileInfo.Size())
+	fmt.Fprintf(w, "cursor: %v\n", cursor)
+
+	chars := make([]byte, limit)
+	fp.Read(chars)
+	fmt.Fprintf(w, "chars:%s \n", string(chars))
+
+	return nil
 }
 
 func detectFileSizeChange(w io.Writer, fileName string) error {
