@@ -19,16 +19,23 @@ func main() {
 	//detectFileSizeChange(os.Stdout, fileName)
 	seek(os.Stdout, fileName)
 
-	var chars = []byte{97, 98, 99, 10, 100, 101, 102, 103, 10, 104, 105, 106, 107, 108, 109, 110, 111, 112, 10, 113, 114, 10, 0, 0, 0, 0, 0, 0, 0, 0}
-	extractLine(os.Stdout, chars)
+	//var chars = []byte{97, 98, 99, 10, 100, 101, 102, 103, 10, 104, 105, 106, 107, 108, 109, 110, 111, 112, 10, 113, 32, 114, 10, 0, 0, 0, 0, 0, 0, 0}
+	//extractLine(os.Stdout, chars)
 }
 
 func extractLine(w io.Writer, chars []byte) {
-	var extracted = make([]byte, 0, len(chars))
+	var extracted []byte
+	tmp := make([]byte, 0, len(chars))
 	for _, char := range chars {
-		extracted = append(extracted, char)
+		tmp = append(tmp, char)
+		if char == 10 {
+			// 改行ごとに詰め込む
+			extracted = make([]byte, len(tmp))
+			copy(extracted, tmp)
+		}
 	}
 	fmt.Fprintf(w, "extracted: %v\n", extracted)
+	fmt.Fprintf(w, "extracted.len: %v\n", len(extracted))
 }
 
 func seek(w io.Writer, fileName string) error {
@@ -43,7 +50,7 @@ func seek(w io.Writer, fileName string) error {
 		return err
 	}
 
-	var offset, limit int64 = 0, 30
+	var offset, limit int64 = 10, 17
 
 	cursor, err := fp.Seek(offset, io.SeekStart)
 	if err != nil {
@@ -63,6 +70,8 @@ func seek(w io.Writer, fileName string) error {
 	}
 	fmt.Fprintf(w, "cursor2: %v\n", cursor)
 	fmt.Fprintf(w, "chars: %v\n", chars)
+
+	extractLine(w, chars)
 
 	return nil
 }
