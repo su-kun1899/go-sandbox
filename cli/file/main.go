@@ -21,6 +21,62 @@ func main() {
 
 	//var chars = []byte{97, 98, 99, 10, 100, 101, 102, 103, 10, 104, 105, 106, 107, 108, 109, 110, 111, 112, 10, 113, 32, 114, 10, 0, 0, 0, 0, 0, 0, 0}
 	//extractLine(os.Stdout, chars)
+
+	ReadLinesFromLast(fileName, 2)
+}
+
+func ReadLinesFromLast(fileName string, count int) ([]string, error) {
+	file, err := os.Open(fileName)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	fileInfo, err := file.Stat()
+	if err != nil {
+		// untested: openできたのにinfoが取れないことはないはず？
+		return nil, err
+	}
+	fmt.Printf("fileName: %v, fileSize: %v\n", fileInfo.Name(), fileInfo.Size())
+	if fileInfo.Size() == 0 {
+		return nil, nil
+	}
+
+	cursor := int64(0)
+	line := ""
+	lineFeedCount := 0
+	for i := 0; ; i++ {
+		// 一文字ずつ後ろから読む
+		cursor--
+		file.Seek(cursor, io.SeekEnd)
+		char := make([]byte, 1)
+		file.Read(char)
+
+		if i != 0 && char[0] == 10 {
+			lineFeedCount++
+		}
+
+		if lineFeedCount == count {
+			break
+		}
+
+		line = fmt.Sprintf("%s%s", string(char), line)
+
+		if cursor == -fileInfo.Size() {
+			break
+		}
+	}
+
+	fmt.Printf("%s", line)
+	fmt.Printf("cursor: %v\n", cursor)
+
+	lastCursor, err := file.Seek(0, io.SeekEnd)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Printf("lastCursor: %v\n", lastCursor)
+
+	return []string{line}, nil
 }
 
 func extractLine(w io.Writer, chars []byte) {
@@ -50,7 +106,7 @@ func seek(w io.Writer, fileName string) error {
 		return err
 	}
 
-	var offset, limit int64 = 10, 17
+	var offset, limit int64 = 21, 30
 
 	cursor, err := fp.Seek(offset, io.SeekStart)
 	if err != nil {
