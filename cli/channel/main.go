@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"time"
 	"log"
 	"errors"
@@ -54,12 +53,18 @@ func main() {
 	select {
 	case a := <-d:
 		log.Printf("diff: %v\n", a)
-		return
 	case b := <-e:
 		log.Printf("err: %v\n", b)
-		return
 	}
-	fmt.Printf("diff: %v\n", diff)
 
 	log.Println("3回目")
+	go watchFoo(d, e)
+	time.Sleep(3 * time.Second)
+	foo = 101
+	select {
+	case a := <-d:
+		log.Printf("diff: %v\n", a)
+	case b := <-e:
+		log.Printf("err: %v\n", b)
+	}
 }
