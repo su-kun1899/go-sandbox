@@ -1,50 +1,47 @@
 package git
 
 import (
-	"fmt"
 	"gopkg.in/src-d/go-git.v4"
-	"gopkg.in/src-d/go-git.v4/plumbing/object"
+	"gopkg.in/src-d/go-git.v4/plumbing"
 	"gopkg.in/src-d/go-git.v4/storage/memory"
+	"reflect"
 	"testing"
 )
 
 func Test(t *testing.T) {
-	// Clones the given repository in memory, creating the remote, the local
-	// branches and fetching the objects, exactly as:
-	Info("git clone https://github.com/su-kun1899/go-sandbox.git")
-
+	// メモリ上に Clone する
 	r, err := git.Clone(memory.NewStorage(), nil, &git.CloneOptions{
 		URL: "https://github.com/su-kun1899/go-sandbox.git",
 	})
-
-	CheckIfError(err)
-
-	// Gets the HEAD history from HEAD, just like this command:
-	Info("git log")
-
-	// ... retrieves the branch pointed by HEAD
-	ref, err := r.Head()
-	CheckIfError(err)
-
-
-	// ... retrieves the commit history
-	cIter, err := r.Log(&git.LogOptions{From: ref.Hash()})
-	CheckIfError(err)
-
-	// ... just iterates over the commits, printing it
-	err = cIter.ForEach(func(c *object.Commit) error {
-		fmt.Println(c)
-		return nil
-	})
-	CheckIfError(err)
-}
-
-func CheckIfError(err error) {
 	if err != nil {
-		panic(err)
+		t.Fatal("unexpected error:", err)
 	}
-}
 
-func Info(s string) {
-	println(s)
+	// 特定のコミットを取り出す
+	h, err := r.ResolveRevision(plumbing.Revision("2e9f025cddcb47dcc54d768f46837d36828fa4cb"))
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+	cIter, err := r.Log(&git.LogOptions{From: *h})
+	defer cIter.Close()
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+	commit, err := cIter.Next()
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	// assert
+	got := commit.Committer.Name
+	want := "su-kun1899"
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("commit.Committer.Name = %v, want %v", got, want)
+	}
+
+	got = commit.Message
+	want = "selectでエラーハンドリングする\n"
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("commit.Message = %v, want %v", got, want)
+	}
 }
