@@ -11,10 +11,10 @@ import (
 func Test(t *testing.T) {
 	// Clones the given repository in memory, creating the remote, the local
 	// branches and fetching the objects, exactly as:
-	Info("git clone https://github.com/src-d/go-siva")
+	Info("git clone https://github.com/su-kun1899/go-sandbox.git")
 
 	r, err := git.Clone(memory.NewStorage(), nil, &git.CloneOptions{
-		URL: "https://github.com/src-d/go-siva",
+		URL: "https://github.com/su-kun1899/go-sandbox.git",
 	})
 
 	CheckIfError(err)
