@@ -1,11 +1,11 @@
 package git_test
 
 import (
-	"gopkg.in/src-d/go-git.v4/utils/merkletrie"
 	"reflect"
 	"testing"
 
 	"github.com/su-kun1899/go-sandbox/git"
+	"gopkg.in/src-d/go-git.v4/utils/merkletrie"
 )
 
 func TestResolveCommit(t *testing.T) {
@@ -139,6 +139,42 @@ func TestResolveChanges(t *testing.T) {
 				default:
 					t.Fatalf("unhandled action: %v", action)
 				}
+			}
+		})
+	}
+}
+
+func TestCheckoutBranch(t *testing.T) {
+	// FIXME remote にテストブランチがある前提になっている
+	type args struct {
+		name string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+		wantMsg string
+	}{
+		{
+			name:    "checkout testdata branch",
+			args:    args{name: "origin/test/testbranch"},
+			wantErr: false,
+			wantMsg: "add testdata\n",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := git.CheckoutBranch(tt.args.name); (err != nil) != tt.wantErr {
+				t.Errorf("CheckoutBranch() error = %v, wantErr %v", err, tt.wantErr)
+			}
+
+			// 切り替え先にだけ存在するコミットで切り替えを確認
+			commit, err := git.HeadCommit()
+			if err != nil {
+				t.Fatal("unexpected error", err)
+			}
+			if !reflect.DeepEqual(commit.Message, tt.wantMsg) {
+				t.Errorf("HeadCommit().Message = %v, want %v", commit.Message, tt.wantMsg)
 			}
 		})
 	}
