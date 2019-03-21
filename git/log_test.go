@@ -1,6 +1,7 @@
-package git
+package git_test
 
 import (
+	"github.com/su-kun1899/go-sandbox/git"
 	"reflect"
 	"testing"
 )
@@ -28,7 +29,7 @@ func TestResolveCommit(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := ResolveCommit(tt.args.hash)
+			got, err := git.ResolveCommit(tt.args.hash)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ResolveCommit() error = %v, wantErr %v", err, tt.wantErr)
 				return
