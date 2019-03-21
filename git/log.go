@@ -24,15 +24,9 @@ func init() {
 
 // TODO go-git の型は隠蔽してインターフェイスで扱うのがよさそう
 func ResolveCommit(hash string) (*object.Commit, error) {
-	// 特定のコミットを取り出す
 	h, err := repo.ResolveRevision(plumbing.Revision(hash))
 	if err != nil {
 		return nil, err
 	}
-	cIter, err := repo.Log(&git.LogOptions{From: *h})
-	defer cIter.Close()
-	if err != nil {
-		return nil, err
-	}
-	return cIter.Next()
+	return repo.CommitObject(*h)
 }
