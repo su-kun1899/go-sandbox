@@ -1,47 +1,44 @@
 package git
 
 import (
-	"gopkg.in/src-d/go-git.v4"
-	"gopkg.in/src-d/go-git.v4/plumbing"
-	"gopkg.in/src-d/go-git.v4/storage/memory"
 	"reflect"
 	"testing"
 )
 
-func Test(t *testing.T) {
-	// メモリ上に Clone する
-	r, err := git.Clone(memory.NewStorage(), nil, &git.CloneOptions{
-		URL: "https://github.com/su-kun1899/go-sandbox.git",
-	})
-	if err != nil {
-		t.Fatal("unexpected error:", err)
+func TestResolveCommit(t *testing.T) {
+	type args struct {
+		hash string
 	}
-
-	// 特定のコミットを取り出す
-	h, err := r.ResolveRevision(plumbing.Revision("2e9f025cddcb47dcc54d768f46837d36828fa4cb"))
-	if err != nil {
-		t.Fatal("unexpected error:", err)
+	type want struct {
+		committerName string
+		commitMessage string
 	}
-	cIter, err := r.Log(&git.LogOptions{From: *h})
-	defer cIter.Close()
-	if err != nil {
-		t.Fatal("unexpected error:", err)
+	tests := []struct {
+		name    string
+		args    args
+		want    want
+		wantErr bool
+	}{
+		{
+			name:    "resolve commit from hash",
+			args:    args{hash: "2e9f025cddcb47dcc54d768f46837d36828fa4cb"},
+			want:    want{committerName: "su-kun1899", commitMessage: "selectでエラーハンドリングする\n"},
+			wantErr: false,
+		},
 	}
-	commit, err := cIter.Next()
-	if err != nil {
-		t.Fatal("unexpected error:", err)
-	}
-
-	// assert
-	got := commit.Committer.Name
-	want := "su-kun1899"
-	if !reflect.DeepEqual(got, want) {
-		t.Errorf("commit.Committer.Name = %v, want %v", got, want)
-	}
-
-	got = commit.Message
-	want = "selectでエラーハンドリングする\n"
-	if !reflect.DeepEqual(got, want) {
-		t.Errorf("commit.Message = %v, want %v", got, want)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := ResolveCommit(tt.args.hash)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ResolveCommit() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got.Committer.Name, tt.want.committerName) {
+				t.Errorf("ResolveCommit().Committer.Name = %v, want %v", got.Committer.Name, tt.want.committerName)
+			}
+			if !reflect.DeepEqual(got.Message, tt.want.commitMessage) {
+				t.Errorf("ResolveCommit().Message = %v, want %v", got.Message, tt.want.commitMessage)
+			}
+		})
 	}
 }
