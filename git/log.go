@@ -30,3 +30,16 @@ func ResolveCommit(hash string) (*object.Commit, error) {
 	}
 	return repo.CommitObject(*h)
 }
+
+func ResolveChanges(from, to *object.Commit) (object.Changes, error) {
+	fromTree, err := from.Tree()
+	if err != nil {
+		return nil, err
+	}
+	toTree, err := to.Tree()
+	if err != nil {
+		return nil, err
+	}
+
+	return fromTree.Diff(toTree)
+}
